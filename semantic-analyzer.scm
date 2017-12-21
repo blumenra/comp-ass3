@@ -3,7 +3,8 @@
         (cond ((or (null? parseExp) (not (pair? parseExp))) parseExp)
             ((and (equal? (car parseExp) 'applic)
                 (equal? (caadr parseExp) 'lambda-simple)
-                (equal? (cadadr parseExp) '()))
+                (equal? (cadadr parseExp) '())
+                (null? (caddr parseExp)))
                 (remove-applic-lambda-nil (car (cddadr parseExp))))
                 (else (map remove-applic-lambda-nil parseExp)))))
 
@@ -121,7 +122,7 @@
         (cond 
             ((or (null? parseExp) (not (pair? parseExp))) parseExp)
             ((equal? (car parseExp) 'lambda-simple)
-                `(lambda-simple ,(cadr parseExp) ,@(box-set (lambda-simple-boxer (cadr parseExp) (cddr parseExp)))))
+                `(lambda-simple ,(cadr parseExp) ,@(box-set (lambda-simple-boxer (reverse (cadr parseExp)) (cddr parseExp)))))
             ((equal? (car parseExp) 'lambda-opt)
                 `(lambda-opt ,(cadr parseExp) ,(caddr parseExp) ,@(box-set (lambda-simple-boxer (append (cadr parseExp) (cddr parseExp)) (cdddr parseExp)))))
             (else 
