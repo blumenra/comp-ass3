@@ -257,7 +257,9 @@
             
             
 
-  
+(define sem-parse
+    (lambda (parsedExp)
+        (annotate-tc (pe->lex-pe (box-set (remove-applic-lambda-nil parsedExp))))))
   
   
   
