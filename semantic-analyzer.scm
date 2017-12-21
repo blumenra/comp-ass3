@@ -59,13 +59,6 @@
             (is-set? var exp) 
             (is-get? var exp))))
             
-;(define boxing
- ;   (lambda (var exp)
-  ;      (if (to-box? var exp)
-   ;         `((seq ((set (var ,var) (box (var ,var)))
-    ;        ,@(to-box-set var (to-box-get var exp)))))
-            
-     ;       exp)))
 (define seq?
     (lambda (exp)
         (and
@@ -108,7 +101,7 @@
             ((and (equal? (car exp) 'lambda-simple) (member var (cadr exp))) exp)
             ((and
                 (equal? (car exp) 'set)
-                (equal? (cadadr exp) var)) `(box-set ,@(cdr exp)))
+                (equal? (cadadr exp) var)) `(box-set ,(cadr exp) ,(to-box-set var (caddr exp))))
             (else (map (lambda (x) (to-box-set var x)) exp)))))
         
 (define lambda-simple-boxer
