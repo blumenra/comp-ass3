@@ -58,14 +58,34 @@
             (is-set? var exp) 
             (is-get? var exp))))
             
+;(define boxing
+ ;   (lambda (var exp)
+  ;      (if (to-box? var exp)
+   ;         `((seq ((set (var ,var) (box (var ,var)))
+    ;        ,@(to-box-set var (to-box-get var exp)))))
+            
+     ;       exp)))
+(define seq?
+    (lambda (exp)
+        (and
+            (list? exp)
+            (not (null? exp))
+            (equal? (car exp) 'seq))))
+            
+(define clean-seq
+    (lambda (exp)
+         (if (seq? exp) (cadr exp) (list exp))))
+
+(define clean-all-after-seq
+    (lambda (exp)
+        (car (map clean-seq exp))))
+        
 (define boxing
     (lambda (var exp)
         (if (to-box? var exp)
             `((seq ((set (var ,var) (box (var ,var)))
-            ,@(to-box-set var (to-box-get var exp)))))
-            
+            ,@(clean-all-after-seq (to-box-set var (to-box-get var exp))))))
             exp)))
-            
             
 (define to-box-get 
   (lambda (var exp)
@@ -252,6 +272,12 @@
                 (let* ((app (if tp? 'tc-applic 'applic))
                         (rest (cdr exp)))
                     `(,app ,@(map (lambda (child) (annotate child #f)) rest))))
+           ((or 
+                (equal? (car exp) 'set)
+                (equal? (car exp) 'box-set))
+                    (let* ((tag (if (equal? (car exp) 'set) 'set 'box-set))
+                        (rest (cdr exp)))
+                        `(,tag ,@(annotate rest #f)))) 
                     
             (else (map (lambda (child) (annotate child tp?)) exp)))))   
             
